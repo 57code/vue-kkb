@@ -9,7 +9,12 @@ class KVue {
         // new Watcher();
         // console.log('模拟compile', this.$data.test);
         
-        this.$compile = new Compile(options.el, this);
+        new Compile(options.el, this);
+
+
+        // 
+        console.log(this);
+        
     }
 
     observe(value){
