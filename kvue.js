@@ -1,108 +1,89 @@
+// new KVue({
+//     data: {
+//         msg: 'hello，vue'
+//     }
+// })
+
 class KVue {
-    constructor(options) {
-        this.$data = options.data; // 保存data选项
-        this.observe(this.$data); // 执行响应式
+  constructor(options) {
+    // 传入data选项
+    this.$data = options.data;
+    // 响应化
+    this.observe(this.$data);
 
-        this.$options = options;
+    // new Watcher();
+    // this.$data.test;
+    // new Watcher();
+    // this.$data.foo.bar;
 
-        // test
-        // new Watcher();
-        // console.log('模拟compile', this.$data.test);
-        
-        new Compile(options.el, this);
+    // 编译
+    new Compile(options.el, this);
 
+    // 执行created钩子
+    options.created.call(this);
+  }
 
-        // 
-        console.log(this);
-        
+  observe(value) {
+    if (!value || typeof value !== "object") {
+      return;
     }
+    // 遍历，执行数据响应式
+    Object.keys(value).forEach(key => {
+      this.defineReactive(value, key);
+    });
+  }
 
-    observe(value){
-        if (!value || typeof value !== 'object' ) {
-            return;
+  defineReactive(obj, key) {
+    const val = obj[key];
+    // 递归
+    // this.observe(val);
+
+    const dep = new Dep(key);
+
+    // 给obj定义属性
+    Object.defineProperty(obj, key, {
+      get() {
+        Dep.target && dep.addDep(Dep.target);
+        // Dep.target = null;
+        return val;
+      },
+      set(newVal) {
+        if (newVal === val) {
+          return;
         }
-        
-        // 遍历data选项
-        Object.keys(value).forEach(key => {
-            // 为每一个key定义响应式
-            this.defineReactive(value, key, value[key]);
-            // 为vue的data做属性代理
-            this.proxyData(key);
-        })
-    }
-
-    defineReactive(obj, key, val) {
-        this.observe(val); // 递归查找嵌套属性
-
-        // 创建Dep
-        const dep = new Dep();
-
-        // 为data对象定义属性
-        Object.defineProperty(obj, key, {
-            enumerable: true, // 可枚举
-            configurable: true, // 可修改或删除
-            get() {
-                Dep.target && dep.addDep(Dep.target);
-                console.log(dep.deps);
-                
-                return val;
-            },
-            set(newVal) {
-                if (newVal === val) {
-                    return;
-                }
-                val = newVal;
-                // console.log('数据发生变化！');
-                dep.notify();
-            }
-        })
-    }
-
-    proxyData(key) {
-        Object.defineProperty(this, key, {
-            get(){
-                return this.$data[key];
-            },
-            set(newVal){
-                this.$data[key] = newVal;
-            },
-        });
-    }
-
+        // console.log(`${key}属性更新了：${val}`);
+        dep.notify(key, newVal);
+      }
+    });
+  }
 }
 
-// 依赖管理器：负责将视图中所有依赖收集管理，包括依赖添加和通知
 class Dep {
-    constructor() {
-        this.deps = []; // deps里面存放的是Watcher的实例
-    }
-    addDep(dep) {
-        this.deps.push(dep);
-    }
-    // 通知所有watcher执行更新
-    notify() {
-        this.deps.forEach(dep => {
-            dep.update();
-        })
-    }
+  constructor(name) {
+    this.name = name;
+    // 存储所有依赖
+    this.deps = [];
+  }
+  addDep(dep) {
+    this.deps.push(dep);
+  }
+  notify(...args) {
+    this.deps.forEach(dep => dep.update(...args));
+  }
 }
 
-// Watcher: 具体的更新执行者
 class Watcher {
-    constructor(vm, key, cb) {
-        this.vm = vm;
-        this.key = key;
-        this.cb = cb;
+  constructor(vm, key, cb) {
+    this.vm = vm;
+    this.key = key;
+    this.cb = cb;
 
-        // 将来new一个监听器时，将当前Watcher实例附加到Dep.target
-        Dep.target = this;
-        this.vm[this.key];
-        Dep.target = null;
-    }
-
-    // 更新
-    update() {
-        // console.log('视图更新啦！');
-        this.cb.call(this.vm, this.vm[this.key]);
-    }
+    Dep.target = this;
+    this.vm[this.key];
+    // Dep.target = null;
+  }
+  update(key, val) {
+    console.log(`${key}属性更新了：${val}`);
+    this.cb.call(this.vm, val);
+  }
 }

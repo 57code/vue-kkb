@@ -4,65 +4,44 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Document</title>
+    <title>kvue</title>
   </head>
   <body>
     <div id="app">
-        {{test}}
-        <p k-text="test"></p>
-        <p k-html="html"></p>
-        <p>
-            <input type="text" k-model="test">
-        </p>
-        <p>
-            <button @click="onClick">按钮</button>
-        </p>
+      <p>{{name}}</p>
+      <p k-text="name"></p>
+      <p>{{age}}</p>
+      <p>{{doubleAge}}</p>
+      <input type="text" k-model="name" />
+      <button @click="changeName">呵呵</button>
+      <div k-html="html"></div>
     </div>
+    <script src="./compile.js"></script>
+    <script src="./kvue.js"></script>
 
-    <script src="kvue.js"></script>
-    <script src="compile.js"></script>
     <script>
-      const o = new KVue({
+      const kaikeba = new KVue({
         el: "#app",
         data: {
-          test: "allala",
-          foo: { bar: "bar" },
-          html: '<button>adfadsf</button>'
+          name: "I am test.",
+          age: 12,
+          html: "<button>这是一个按钮</button>"
+        },
+        created() {
+          console.log("开始啦");
+          setTimeout(() => {
+            this.$data.name = "我是测试";
+          }, 1500);
         },
         methods: {
-            onClick() {
-                alert('blabla')
-            }
-        },
+          changeName() {
+            this.name = "哈喽，开课吧";
+            this.age = 1;
+            this.id = "xx";
+            console.log(1, this);
+          }
+        }
       });
-      console.log(o.$data.test);
-      o.$data.test = "hello,kvue!";
-      console.log(o.$data.test);
-
-      console.log(o.$data.foo.bar);
-      o.$data.foo.bar = "hello,kvue!";
-      console.log(o.$data.foo.bar);
     </script>
-
-    <!-- <div id="app">
-        <p>你好，<span id="name"></span></p>
-    </div>
-    <script>
-        var obj = {};
-
-        Object.defineProperty(obj, 'name', {
-            get: function () {
-                return document.getElementById('name').innerHTML;
-            },
-            set: function (inner) {
-                document.getElementById('name').innerHTML = inner;
-            }
-        })
-
-        console.log(obj.name);
-        obj.name = '乔峰';
-        console.log(obj.name);
-        
-    </script> -->
   </body>
 </html>
