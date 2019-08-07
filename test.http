@@ -1,0 +1,12 @@
+POST http://www.yunplc.com:7080/exlog
+
+GRM=53231220106&PASS=xfgd0987654321
+
+###
+
+POST http://120.27.155.137:7080/exdata?SID=BB87314DAE08E209&OP=P HTTP/1.1
+Content-Type: text/plain; charset=utf-8
+
+1
+泵开M1
+1
