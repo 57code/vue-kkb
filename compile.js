@@ -82,10 +82,46 @@ class Compile {
         const dir = attrName.substring(2); // text
         this[dir] && this[dir](node, exp);
       }
+
+      if (attrName.indexOf('@') === 0) {
+        const dir = attrName.substring(1);
+        this.eventHandler(node, exp, dir)
+      }
     });
   }
 
   text(node, exp) {
     this.update(node, exp, "text");
   }
+
+  model(node, exp) {
+    // 执行更新
+    this.update(node, exp, "model");
+
+    // 事件监听
+    node.addEventListener('input', e => {
+      this.$vm[exp] = e.target.value
+    })
+  }
+
+  modelUpdater(node, value) {
+    node.value = value;
+  }
+
+  html(node, exp) {
+    this.update(node, exp, "html");
+  }
+
+  htmlUpdater(node, value) {
+    node.innerHTML = value;
+  }
+
+  eventHandler(node, exp, dir) {
+    // 获取回调函数
+    const fn = this.$vm.$options.methods && this.$vm.$options.methods[exp]
+    if (dir && fn) {
+      node.addEventListener(dir, fn.bind(this.$vm))
+    }
+  }
+
 }
