@@ -11,8 +11,14 @@ class KVue {
     this.observe(this.$data);
 
     // 2.依赖收集
-    new Watcher(this, 'test');
-    this.test;
+    // new Watcher(this, 'test');
+    // this.test;
+    new Compiler(options.el, this);
+
+    // 执行一下钩子函数
+    if (options.created) {
+        options.created.call(this);
+    }
   }
 
   observe(value) {
@@ -87,14 +93,20 @@ class Dep {
 
 // Watcher：负责创建data中key和更新函数的映射关系
 class Watcher {
-    constructor(vm, key) {
-        Dep.target = this; // 把当前watcher实例附加到Dep静态属性上
+    constructor(vm, key, cb) {
+        
         this.vm = vm;
         this.key = key;
+        this.cb = cb;
+
+        Dep.target = this; // 把当前watcher实例附加到Dep静态属性上
+        this.vm[this.key]; // 触发依赖收集
+        Dep.target = null;
     }
 
     update() {
-        console.log(`${this.key}属性更新了`);
+        // console.log(`${this.key}属性更新了`);
+        this.cb.call(this.vm, this.vm[this.key])
         
     }
 }

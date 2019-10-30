@@ -6,18 +6,45 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 </head>
+
 <body>
-    
-    <script src="kvue.js"></script>
-    <script>
-        const app = new KVue({
+        <div id="app">
+          <p>{{name}}</p>
+          <p k-text="name"></p>
+          <p>{{age}}</p>
+          <p>
+            {{doubleAge}}
+          </p>
+          <input type="text" k-model="name">
+          <button @click="changeName">呵呵</button>
+          <div k-html="html"></div>
+        </div>
+
+
+        <script src='./compiler.js'></script>
+        <script src='./kvue.js'></script>
+      
+        <script>
+          const kaikeba = new KVue({
+            el:'#app',
             data: {
-                test: 'i am test',
-                foo: {bar: 'bar'}
+              name: "I am test.",
+              age:12,
+              html:'<button>这是一个按钮</button>'
+            },
+            created(){
+              console.log('开始啦')
+              setTimeout(()=>{
+                this.name='我是测试'
+              }, 1500)
+            },
+            methods:{
+              changeName(){
+                this.name = '哈喽，开课吧'
+                this.age = 1
+              }
             }
-        })
-        app.test = 'hello, kaikeba!'
-        app.foo.bar = 'oh my bar!'
-    </script>
-</body>
+          })
+        </script>
+      </body>
 </html>
