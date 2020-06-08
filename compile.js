@@ -1,3 +1,4 @@
+console.log('佛祖保佑')
 // 扫描模板中所有依赖创建更新函数和watcher
 class Compile {
   // el是宿主元素或其选择器
